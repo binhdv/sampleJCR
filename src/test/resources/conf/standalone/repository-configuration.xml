@@ -1,0 +1,60 @@
+<repository-service default-repository="${gatein.jcr.repository.default}">
+  <repositories>
+    <repository name="${gatein.jcr.repository.default}" system-workspace="${gatein.jcr.workspace.system}" default-workspace="${gatein.jcr.workspace.default}">
+      <security-domain>exo-domain</security-domain>
+      <session-max-age>1h</session-max-age>
+      <authentication-policy>org.exoplatform.services.jcr.impl.core.access.JAASAuthenticator</authentication-policy>
+      <workspaces>
+        <workspace name="${gatein.jcr.workspace.default}">
+          <container class="org.exoplatform.services.jcr.impl.storage.jdbc.optimisation.CQJDBCWorkspaceDataContainer">
+            <properties>
+              <property name="source-name" value="jdbcjcr" />
+              <property name="dialect" value="auto" />
+              <property name="multi-db" value="false" />
+              <property name="update-storage" value="false" />
+              <property name="max-buffer-size" value="200k" />
+              <property name="swap-directory" value="target/temp/swap/lab" />
+            </properties>
+            <value-storages>
+              <value-storage id="lab" class="org.exoplatform.services.jcr.impl.storage.value.fs.TreeFileValueStorage">
+                <properties>
+                  <property name="path" value="target/temp/values/lab" />
+                </properties>
+                <filters>
+                  <filter property-type="Binary" />
+                </filters>
+              </value-storage>
+            </value-storages>
+          </container>
+          <initializer class="org.exoplatform.services.jcr.impl.core.ScratchWorkspaceInitializer">
+            <properties>
+              <property name="root-nodetype" value="nt:unstructured"/>
+            </properties>
+          </initializer>
+          <cache enabled="true">
+            <properties>
+              <property name="max-size" value="20000" />
+              <property name="live-time" value="30000" />
+            </properties>
+          </cache>
+          <query-handler class="org.exoplatform.services.jcr.impl.core.query.lucene.SearchIndex">
+            <properties>
+              <property name="index-dir" value="target/temp/index/repository/lab" />
+              <property name="support-highlighting" value="true" />
+              <property name="excerptprovider-class" value="org.exoplatform.services.jcr.impl.core.query.lucene.DefaultHTMLExcerpt" />                           
+            </properties>
+            
+          </query-handler>
+          <lock-manager>
+            <time-out>15m</time-out><!-- 15min -->
+            <persister class="org.exoplatform.services.jcr.impl.core.lock.FileSystemLockPersister">
+              <properties>
+                <property name="path" value="../temp/lock/gadgets" />
+              </properties>
+            </persister>
+          </lock-manager>
+        </workspace>
+      </workspaces>
+    </repository>
+  </repositories>
+</repository-service>
